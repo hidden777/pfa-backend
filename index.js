@@ -146,14 +146,13 @@ app.post("/login", async(req, res) => {
         if(!user.verified) {
            return res.status(400).json({message: "User is not verified"});
         }
-
+        
         bcrypt.compare(password, user.password, (err, response)=>{
-            if(err) {
-                return res.status(401).json({message: "Invalid Password"});
-            }
             if(response) {
                 const token = jwt.sign({userId: user._id}, secretKey);
                 res.status(200).json({token});
+            } else {
+                return res.status(401).json({message: "Invalid Password"});
             }
         });
     } catch(err) {
