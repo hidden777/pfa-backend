@@ -35,6 +35,7 @@ const Results = require('./models/results');
 const sendVerificationEmail = async(email, verificationToken) => {
     const authEmail = process.env.AUTH_EMAIL;
     const authPass = process.env.AUTH_PASS;
+    const domainLink = process.env.DOMAIN_LINK;
     const transporter = nodemailer.createTransport({
         service: "gmail",
         auth:{
@@ -47,7 +48,7 @@ const sendVerificationEmail = async(email, verificationToken) => {
         from: "Psychological First Aid Screening",
         to: email,
         subject: "Email Verification",
-        text: `Please click the following link to verify your email: http://192.168.1.5:8000/verify/${verificationToken}`,
+        text: `Please click the following link to verify your email: ${domainLink}/verify/${verificationToken}`,
     };
 
     try{
