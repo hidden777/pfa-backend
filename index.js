@@ -160,6 +160,37 @@ app.post("/login", async(req, res) => {
     }
 })
 
+app.post("/delete", async(req, res) => {
+    try{
+        const {email, password, confirmPassword} = req.body;
+        if(password !== confirmPassword) {
+            return res.status(402).json({message: "Password and Confirm Password are not same."});
+        }
+        const user = await User.findOne({email});
+        
+        if(!user) {
+            return res.status(401).json({message: "Invalid Email or Password"});
+        }
+        
+        if(!user.verified) {
+           return res.status(400).json({message: "User is not verified"});
+        }
+        
+        bcrypt.compare(password, user.password, async(err, response)=>{
+            if(response) {
+                const userId = user._id;
+                await User.deleteOne(user);
+                await Results.deleteMany({user: userId});
+                res.status(200).json({result: "Account deleted successfully"});
+            } else {
+                return res.status(403).json({message: "Invalid Password"});
+            }
+        });
+    } catch(err) {
+        res.status(500).json({message: "Deletion failed"});
+    }
+})
+
 app.get("/getUser/:userId", async(req, res) => {
     try {
         const userId = req.params.userId;
@@ -263,4 +294,4 @@ app.post("/resetPassword", async(req, res) => {
     } catch (err) {
         res.status(500).json({message: "Reset Password Failed"});
     }
-})
+}) 
